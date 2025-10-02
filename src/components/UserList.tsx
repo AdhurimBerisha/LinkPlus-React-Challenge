@@ -181,73 +181,72 @@ const UserList = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {sortUsers.map((user) => (
-            <Card
-              key={user.id}
-              className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer bg-white/80 backdrop-blur-sm border-0 shadow-md"
-            >
-              <CardHeader className="pb-3">
-                <div className="flex justify-between items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-lg font-semibold text-gray-900 truncate  transition-colors">
-                      {user.name}
-                    </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      @{user.username}
-                    </p>
-                  </div>
-                  <CardAction className="flex gap-2">
-                    <Link to={`/user/${user.id}`}>
+            <Link key={user.id} to={`/user/${user.id}`} className="block">
+              <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer bg-white/80 backdrop-blur-sm border-0 shadow-md">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-lg font-semibold text-gray-900 truncate  transition-colors">
+                        {user.name}
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        @{user.username}
+                      </p>
+                    </div>
+                    <CardAction className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         className="opacity-0 cursor-pointer group-hover:opacity-100 transition-opacity duration-200 bg-blue-50"
+                        onClick={(e) => e.preventDefault()}
                       >
                         View
                       </Button>
-                    </Link>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(user.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </CardAction>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <span className="text-xs font-medium text-gray-600 min-w-fit">
-                      Email:
-                    </span>
-                    <span className="text-xs text-muted-foreground truncate">
-                      {user.email}
-                    </span>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(user.id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </CardAction>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-xs font-medium text-gray-600 min-w-fit">
-                      Company:
-                    </span>
-                    <span className="text-xs text-muted-foreground truncate">
-                      {user.company.name}
-                    </span>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-medium text-gray-600 min-w-fit">
+                        Email:
+                      </span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        {user.email}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-medium text-gray-600 min-w-fit">
+                        Company:
+                      </span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        {user.company.name}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-medium text-gray-600 min-w-fit">
+                        Phone:
+                      </span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        {user.phone}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-xs font-medium text-gray-600 min-w-fit">
-                      Phone:
-                    </span>
-                    <span className="text-xs text-muted-foreground truncate">
-                      {user.phone}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
