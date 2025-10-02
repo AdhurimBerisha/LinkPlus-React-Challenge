@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { ArrowLeft, User, Phone, Building, MapPin } from "lucide-react";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store/store";
-import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import type { NewUser } from "@/types/User";
 import { addUser } from "@/store/slices/usersSlice";
 
@@ -12,44 +12,30 @@ const AddUser = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const INITIAL_FORM_STATE: NewUser = {
-    name: "",
-    email: "",
-    username: "",
-    phone: "",
-    website: "",
-    company: { name: "" },
-    address: { street: "", city: "", zipcode: "" },
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<NewUser>({
+    defaultValues: {
+      name: "",
+      email: "",
+      username: "",
+      phone: "",
+      website: "",
+      company: { name: "" },
+      address: { street: "", city: "", zipcode: "" },
+    },
+  });
 
-  const [formData, setFormData] = useState<NewUser>(INITIAL_FORM_STATE);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    if (name.includes(".")) {
-      const [parent, child] = name.split(".");
-      setFormData((prev) => ({
-        ...prev,
-        [parent]: {
-          ...(prev[parent as keyof NewUser] as object),
-          [child]: value,
-        },
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const onSubmit = (data: NewUser) => {
     const newUser = {
       id: Date.now(),
-      ...formData,
+      ...data,
     };
     dispatch(addUser(newUser));
-    setFormData(INITIAL_FORM_STATE);
+    reset();
     alert("User added successfully");
     navigate("/");
   };
@@ -76,7 +62,7 @@ const AddUser = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 mr-10 ml-10">
@@ -96,12 +82,21 @@ const AddUser = () => {
                 <input
                   type="text"
                   id="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  name="name"
+                  {...register("name", {
+                    required: "Full name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters",
+                    },
+                  })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter full name"
                 />
+                {errors.name && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -114,12 +109,21 @@ const AddUser = () => {
                 <input
                   type="email"
                   id="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  name="email"
+                  {...register("email", {
+                    required: "Email address is required",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Please enter a valid email address",
+                    },
+                  })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter email address"
                 />
+                {errors.email && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -132,9 +136,7 @@ const AddUser = () => {
                 <input
                   type="text"
                   id="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  name="username"
+                  {...register("username")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter username"
                 />
@@ -160,9 +162,7 @@ const AddUser = () => {
                 <input
                   type="tel"
                   id="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  name="phone"
+                  {...register("phone")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter phone number"
                 />
@@ -178,9 +178,7 @@ const AddUser = () => {
                 <input
                   type="url"
                   id="website"
-                  value={formData.website}
-                  onChange={handleChange}
-                  name="website"
+                  {...register("website")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter website URL"
                 />
@@ -206,9 +204,7 @@ const AddUser = () => {
                 <input
                   type="text"
                   id="company.name"
-                  value={formData.company.name}
-                  onChange={handleChange}
-                  name="company.name"
+                  {...register("company.name")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter company name"
                 />
@@ -234,9 +230,7 @@ const AddUser = () => {
                 <input
                   type="text"
                   id="address.street"
-                  value={formData.address.street}
-                  onChange={handleChange}
-                  name="address.street"
+                  {...register("address.street")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter street address"
                 />
@@ -253,9 +247,7 @@ const AddUser = () => {
                   <input
                     type="text"
                     id="address.city"
-                    value={formData.address.city}
-                    onChange={handleChange}
-                    name="address.city"
+                    {...register("address.city")}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                     placeholder="Enter city"
                   />
@@ -271,9 +263,7 @@ const AddUser = () => {
                   <input
                     type="text"
                     id="address.zipcode"
-                    value={formData.address.zipcode}
-                    onChange={handleChange}
-                    name="address.zipcode"
+                    {...register("address.zipcode")}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                     placeholder="Enter zipcode"
                   />
