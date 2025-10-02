@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import {
@@ -15,6 +15,8 @@ import type { User } from "@/types/User";
 const UserList = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "email" | "company" | "">("");
+  const [sortAsc, setSortAsc] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -28,16 +30,45 @@ const UserList = () => {
       }
     };
     fetchUsers();
-  });
+  }, []);
 
-  const filterUsers = users.filter((user) => {
-    const query = searchQuery.toLocaleLowerCase();
-    return (
-      user.name.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query) ||
-      user.username.toLowerCase().includes(query)
+  const filterUsers = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query) ||
+        user.username.toLowerCase().includes(query)
     );
-  });
+  }, [users, searchQuery]);
+
+  const sortUsers = useMemo(() => {
+    if (!sortBy) return filterUsers;
+
+    const sorted = [...filterUsers].sort((a, b) => {
+      let compare = 0;
+      if (sortBy === "name") compare = a.name.localeCompare(b.name);
+      if (sortBy === "email") compare = a.email.localeCompare(b.email);
+      if (sortBy === "company")
+        compare = a.company.name.localeCompare(b.company.name);
+      return sortAsc ? compare : -compare;
+    });
+    return sorted;
+  }, [filterUsers, sortBy, sortAsc]);
+
+  const handleSort = (field: "name" | "email" | "company") => {
+    if (sortBy === field) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortBy(field);
+      setSortAsc(true);
+    }
+  };
+
+  const resetFilters = () => {
+    setSortBy("");
+    setSortAsc(true);
+  };
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
@@ -71,32 +102,39 @@ const UserList = () => {
 
       <div className="flex flex-wrap gap-2 mb-8">
         <Button
-          variant="outline"
           size="sm"
+          onClick={() => handleSort("name")}
           className="flex items-center gap-2 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
         >
           <ArrowUpDown className="h-4 w-4" />
           <span className="hidden sm:inline">Sort by</span> Name
         </Button>
         <Button
-          variant="outline"
           size="sm"
+          onClick={() => handleSort("email")}
           className="flex items-center cursor-pointer gap-2 bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
         >
           <ArrowUpDown className="h-4 w-4" />
           <span className="hidden sm:inline">Sort by</span> Email
         </Button>
         <Button
-          variant="outline"
+          onClick={() => handleSort("company")}
           size="sm"
           className="flex items-center gap-2 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
         >
           <ArrowUpDown className="h-4 w-4" />
           <span className="hidden sm:inline">Sort by</span> Company
         </Button>
+        <Button
+          size="sm"
+          onClick={resetFilters}
+          className="flex items-center gap-2 cursor-pointer bg-red-50 text-red-700 hover:bg-red-100 transition-all duration-200"
+        >
+          Reset Filters
+        </Button>
       </div>
 
-      {filterUsers.length === 0 ? (
+      {sortUsers.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-white text-lg">
             No users found matching "{searchQuery}"
@@ -104,7 +142,7 @@ const UserList = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-          {filterUsers.map((user) => (
+          {sortUsers.map((user) => (
             <Card
               key={user.id}
               className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer bg-white/80 backdrop-blur-sm border-0 shadow-md"
