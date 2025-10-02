@@ -120,7 +120,7 @@ const UserList = () => {
           </p>
         </div>
         <Link to="/add-user">
-          <Button className="flex items-center gap-2  cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200">
+          <Button className="flex items-center gap-2  cursor-pointer bg-white/70 text-black backdrop-blur-sm hover:bg-white/90 transition-all duration-200">
             <Plus className="h-4 w-4" />
             Add User
           </Button>
@@ -142,7 +142,7 @@ const UserList = () => {
         <Button
           size="sm"
           onClick={() => handleSort("name")}
-          className="flex items-center gap-2 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
+          className="flex items-center gap-2 cursor-pointer bg-white/70 text-black backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
         >
           <ArrowUpDown className="h-4 w-4" />
           <span className="hidden sm:inline">Sort by</span> Name
@@ -150,7 +150,7 @@ const UserList = () => {
         <Button
           size="sm"
           onClick={() => handleSort("email")}
-          className="flex items-center cursor-pointer gap-2 bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
+          className="flex items-center cursor-pointer gap-2 bg-white/70 text-black backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
         >
           <ArrowUpDown className="h-4 w-4" />
           <span className="hidden sm:inline">Sort by</span> Email
@@ -158,7 +158,7 @@ const UserList = () => {
         <Button
           onClick={() => handleSort("company")}
           size="sm"
-          className="flex items-center gap-2 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
+          className="flex items-center gap-2 cursor-pointer bg-white/70 text-black backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
         >
           <ArrowUpDown className="h-4 w-4" />
           <span className="hidden sm:inline">Sort by</span> Company
@@ -193,19 +193,11 @@ const UserList = () => {
                         @{user.username}
                       </p>
                     </div>
-                    <CardAction className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="opacity-0 cursor-pointer group-hover:opacity-100 transition-opacity duration-200 bg-blue-50"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        View
-                      </Button>
+                    <CardAction>
                       <Button
                         variant="destructive"
                         size="sm"
-                        className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();

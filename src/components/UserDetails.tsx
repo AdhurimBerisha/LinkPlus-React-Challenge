@@ -57,7 +57,7 @@ const UserDetails = () => {
         <Link to="/">
           <Button
             size="sm"
-            className="flex items-center cursor-pointer gap-2 bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
+            className="flex items-center cursor-pointer gap-2 bg-white/70 text-black backdrop-blur-sm hover:bg-white/90 transition-all duration-200"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Back to</span> Users
@@ -72,7 +72,7 @@ const UserDetails = () => {
           </p>
         </div>
         <Link to={`/edit-user/${user.id}`}>
-          <Button className="flex items-center cursor-pointer gap-2 bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200">
+          <Button className="flex items-center cursor-pointer gap-2 bg-white/70 text-black backdrop-blur-sm hover:bg-white/90 transition-all duration-200">
             Edit
           </Button>
         </Link>
