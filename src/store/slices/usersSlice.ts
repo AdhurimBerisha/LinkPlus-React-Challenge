@@ -36,7 +36,8 @@ const usersSlice = createSlice({
   initialState,
   reducers: {
     addUser: (state, action: PayloadAction<User>) => {
-      state.users.push(action.payload);
+      state.users.unshift(action.payload);
+      saveUsers(state.users);
     },
     editUser: (state, action: PayloadAction<User>) => {
       const index = state.users.findIndex(
