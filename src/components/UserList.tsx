@@ -8,12 +8,12 @@ import {
   CardAction,
 } from "./ui/card";
 
-import { fetchUsers } from "@/store/slices/usersSlice";
+import { deleteUser, fetchUsers } from "@/store/slices/usersSlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store/store";
 import type { User } from "@/types/User";
 import { Button } from "./ui/button";
-import { Search, Plus, ArrowUpDown } from "lucide-react";
+import { Search, Plus, ArrowUpDown, Trash2 } from "lucide-react";
 
 const UserList = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -65,6 +65,13 @@ const UserList = () => {
   const resetFilters = () => {
     setSortBy("");
     setSortAsc(true);
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm("Are you sure you want to delete this user?")) {
+      dispatch(deleteUser(id));
+      alert("User deleted successfully");
+    }
   };
 
   if (loading) {
@@ -172,7 +179,7 @@ const UserList = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {sortUsers.map((user) => (
             <Card
               key={user.id}
@@ -188,16 +195,27 @@ const UserList = () => {
                       @{user.username}
                     </p>
                   </div>
-                  <CardAction>
+                  <CardAction className="flex gap-2">
                     <Link to={`/user/${user.id}`}>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="opacity-0 cursor-pointer group-hover:opacity-100 transition-opacity duration-200 bg-blue-50  "
+                        className="opacity-0 cursor-pointer group-hover:opacity-100 transition-opacity duration-200 bg-blue-50"
                       >
                         View
                       </Button>
                     </Link>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(user.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </CardAction>
                 </div>
               </CardHeader>

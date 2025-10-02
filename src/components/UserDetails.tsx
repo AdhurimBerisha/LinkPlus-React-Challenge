@@ -71,6 +71,11 @@ const UserDetails = () => {
             @{user.username}
           </p>
         </div>
+        <Link to={`/edit-user/${user.id}`}>
+          <Button className="flex items-center cursor-pointer gap-2 bg-white/70 backdrop-blur-sm hover:bg-white/90 transition-all duration-200">
+            Edit
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
