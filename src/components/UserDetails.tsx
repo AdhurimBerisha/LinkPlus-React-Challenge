@@ -37,10 +37,10 @@ const UserDetails = () => {
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white bg-clip-text ">
+          <h1 className="text-3xl sm:text-4xl font-bold text-black/70 bg-clip-text ">
             {user?.name}
           </h1>
-          <p className="text-white text-sm sm:text-base mt-1">
+          <p className="text-black/70 text-sm sm:text-base mt-1">
             @{user?.username}
           </p>
         </div>
