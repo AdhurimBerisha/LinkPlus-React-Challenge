@@ -22,9 +22,9 @@ export interface User {
 export interface NewUser {
   name: string;
   email: string;
-  username?: string;
-  phone?: string;
-  website?: string;
-  company?: Partial<Company>;
-  address?: Partial<Address>;
+  username: string;
+  phone: string;
+  website: string;
+  company: { name: string };
+  address: { street: string; city: string; zipcode: string };
 }

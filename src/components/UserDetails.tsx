@@ -1,28 +1,55 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { ArrowLeft, Mail, Phone, Globe, MapPin, Building } from "lucide-react";
 import type { User } from "@/types/User";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch } from "@/store/store";
+import type { RootState } from "../store/store";
+import { fetchUsers } from "@/store/slices/usersSlice";
 
 const UserDetails = () => {
   const { id } = useParams();
-  const [user, setUser] = useState<User>();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { users: usersInStore, loading } = useSelector(
+    (state: RootState) => state.users
+  );
+  const user = usersInStore.find((u) => u.id === Number(id));
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get<User>(
-          `https://jsonplaceholder.typicode.com/users/${id}`
-        );
-        setUser(response.data);
-      } catch (error) {
-        console.error("Error fetching user", error);
+    const loadUser = async () => {
+      if (usersInStore.length === 0) {
+        await dispatch(fetchUsers());
+      }
+
+      if (!user && id) {
+        try {
+          const response = await axios.get<User>(
+            `https://jsonplaceholder.typicode.com/users/${id}`
+          );
+
+          console.log("User found in API:", response.data);
+        } catch (error) {
+          console.error("Error fetching user", error);
+        }
       }
     };
-    fetchUser();
-  }, [id]);
+
+    loadUser();
+  }, [id, user, dispatch, usersInStore.length]);
+
+  if (loading) {
+    return <div className="container mx-auto p-8 text-center">Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="container mx-auto p-8 text-center">User not found</div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-6xl">
@@ -38,10 +65,10 @@ const UserDetails = () => {
         </Link>
         <div className="flex-1">
           <h1 className="text-3xl sm:text-4xl font-bold text-black/70 bg-clip-text ">
-            {user?.name}
+            {user.name}
           </h1>
           <p className="text-black/70 text-sm sm:text-base mt-1">
-            @{user?.username}
+            @{user.username}
           </p>
         </div>
       </div>
@@ -62,7 +89,7 @@ const UserDetails = () => {
               <div className="flex-1">
                 <p className="text-sm font-semibold text-gray-700">Email</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {user?.email}
+                  {user.email}
                 </p>
               </div>
             </div>
@@ -73,7 +100,7 @@ const UserDetails = () => {
               <div className="flex-1">
                 <p className="text-sm font-semibold text-gray-700">Phone</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {user?.phone}
+                  {user.phone}
                 </p>
               </div>
             </div>
@@ -84,12 +111,12 @@ const UserDetails = () => {
               <div className="flex-1">
                 <p className="text-sm font-semibold text-gray-700">Website</p>
                 <a
-                  href={`http://${user?.website}`}
+                  href={`http://${user.website}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors mt-1 block"
                 >
-                  {user?.website}
+                  {user.website}
                 </a>
               </div>
             </div>
@@ -104,11 +131,17 @@ const UserDetails = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 p-6">
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-2">Street</p>
+              <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-lg">
+                {user.address.street}
+              </p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-semibold text-gray-700 mb-2">City</p>
                 <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-lg">
-                  {user?.address.city}
+                  {user.address.city}
                 </p>
               </div>
               <div>
@@ -116,7 +149,7 @@ const UserDetails = () => {
                   Zipcode
                 </p>
                 <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-lg">
-                  {user?.address.zipcode}
+                  {user.address.zipcode}
                 </p>
               </div>
             </div>
@@ -136,7 +169,7 @@ const UserDetails = () => {
                 Company Name
               </p>
               <p className="text-base font-medium text-gray-900 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
-                {user?.company.name}
+                {user.company.name}
               </p>
             </div>
           </CardContent>

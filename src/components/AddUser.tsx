@@ -1,9 +1,59 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { ArrowLeft, User, Phone, Building, MapPin } from "lucide-react";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/store/store";
+import React, { useState } from "react";
+import type { NewUser } from "@/types/User";
+import { addUser } from "@/store/slices/usersSlice";
 
 const AddUser = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  const INITIAL_FORM_STATE: NewUser = {
+    name: "",
+    email: "",
+    username: "",
+    phone: "",
+    website: "",
+    company: { name: "" },
+    address: { street: "", city: "", zipcode: "" },
+  };
+
+  const [formData, setFormData] = useState<NewUser>(INITIAL_FORM_STATE);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    if (name.includes(".")) {
+      const [parent, child] = name.split(".");
+      setFormData((prev) => ({
+        ...prev,
+        [parent]: {
+          ...(prev[parent as keyof NewUser] as object),
+          [child]: value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const newUser = {
+      id: Date.now(),
+      ...formData,
+    };
+    dispatch(addUser(newUser));
+    setFormData(INITIAL_FORM_STATE);
+    alert("User added successfully");
+    navigate("/");
+  };
+
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-5xl">
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
@@ -26,7 +76,7 @@ const AddUser = () => {
         </div>
       </div>
 
-      <form className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 mr-10 ml-10">
@@ -46,6 +96,8 @@ const AddUser = () => {
                 <input
                   type="text"
                   id="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   name="name"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter full name"
@@ -62,6 +114,8 @@ const AddUser = () => {
                 <input
                   type="email"
                   id="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   name="email"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter email address"
@@ -78,6 +132,8 @@ const AddUser = () => {
                 <input
                   type="text"
                   id="username"
+                  value={formData.username}
+                  onChange={handleChange}
                   name="username"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter username"
@@ -104,6 +160,8 @@ const AddUser = () => {
                 <input
                   type="tel"
                   id="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
                   name="phone"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter phone number"
@@ -120,6 +178,8 @@ const AddUser = () => {
                 <input
                   type="url"
                   id="website"
+                  value={formData.website}
+                  onChange={handleChange}
                   name="website"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter website URL"
@@ -146,6 +206,8 @@ const AddUser = () => {
                 <input
                   type="text"
                   id="company.name"
+                  value={formData.company.name}
+                  onChange={handleChange}
                   name="company.name"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter company name"
@@ -172,25 +234,11 @@ const AddUser = () => {
                 <input
                   type="text"
                   id="address.street"
+                  value={formData.address.street}
+                  onChange={handleChange}
                   name="address.street"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                   placeholder="Enter street address"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="address.suite"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Suite/Apartment
-                </label>
-                <input
-                  type="text"
-                  id="address.suite"
-                  name="address.suite"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
-                  placeholder="Enter suite or apartment number"
                 />
               </div>
 
@@ -205,6 +253,8 @@ const AddUser = () => {
                   <input
                     type="text"
                     id="address.city"
+                    value={formData.address.city}
+                    onChange={handleChange}
                     name="address.city"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                     placeholder="Enter city"
@@ -221,6 +271,8 @@ const AddUser = () => {
                   <input
                     type="text"
                     id="address.zipcode"
+                    value={formData.address.zipcode}
+                    onChange={handleChange}
                     name="address.zipcode"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent focus:bg-white transition-all duration-200"
                     placeholder="Enter zipcode"

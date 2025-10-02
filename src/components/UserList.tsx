@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Card,
@@ -8,34 +7,32 @@ import {
   CardTitle,
   CardAction,
 } from "./ui/card";
+
+import { fetchUsers } from "@/store/slices/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "@/store/store";
+import type { User } from "@/types/User";
 import { Button } from "./ui/button";
 import { Search, Plus, ArrowUpDown } from "lucide-react";
-import type { User } from "@/types/User";
 
 const UserList = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { users, loading, error } = useSelector(
+    (state: RootState) => state.users
+  );
+
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "email" | "company" | "">("");
   const [sortAsc, setSortAsc] = useState(true);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get<User[]>(
-          "https://jsonplaceholder.typicode.com/users"
-        );
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Error fetching users", error);
-      }
-    };
-    fetchUsers();
-  }, []);
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
   const filterUsers = useMemo(() => {
     const query = searchQuery.toLowerCase();
     return users.filter(
-      (user) =>
+      (user: User) =>
         user.name.toLowerCase().includes(query) ||
         user.email.toLowerCase().includes(query) ||
         user.username.toLowerCase().includes(query)
@@ -69,6 +66,40 @@ const UserList = () => {
     setSortBy("");
     setSortAsc(true);
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading users...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="text-center">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
+              <div className="text-red-600 text-xl mb-2">⚠️ Error</div>
+              <p className="text-red-700 mb-4">{error}</p>
+              <Button
+                onClick={() => dispatch(fetchUsers())}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                Try Again
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
